@@ -1,4 +1,5 @@
 === Disable User Login ===
+
 Contributors: sflores
 Tags: users, login, disable, Register, disable user, Disable Register, wp-admin disable, wp-login disable, wp admin disable, wp login disable
 Requires at least: 4.0.0
