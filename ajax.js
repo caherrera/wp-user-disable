@@ -10,8 +10,14 @@ function disableUser_byId(userid){
         success: function(response) {
             console.log("Resp: " + response);
             if(response == 1){
-                location.reload();
+                jQuery('#wpbody-content .wrap .wp-header-end').after('<div id="notice-bloqueo-usuarios" class="updated notice"> Usuario deshabilitado con éxito</div>');
             }
+            else{
+                jQuery('#wpbody-content .wrap .wp-header-end').after('<div id="notice-bloqueo-usuarios" class="error notice"> Usuario no pudo ser deshabilitado!</div>');
+            }
+            setTimeout(function() {
+                 window.location.reload();
+              }, 1000);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log(textStatus, errorThrown);
@@ -30,8 +36,15 @@ function enableUser_byId(userid){
         },
         success: function(userresponse) {
             if(userresponse == 1){
-                location.reload();
+                //location.reload();
+                jQuery('#wpbody-content .wrap .wp-header-end').after('<div id="notice-bloqueo-usuarios" class="updated notice"> Usuario habilitado con éxito</div>');
             }
+            else{
+                jQuery('#wpbody-content .wrap .wp-header-end').after('<div id="notice-bloqueo-usuarios" class="error notice"> Usuario no pudo ser habilitado!</div>');
+            }
+            setTimeout(function() {
+                 window.location.reload();
+              }, 1000);
             
         },
         error: function(jqXHR, textStatus, errorThrown) {
