@@ -15,8 +15,6 @@ class dwul_user_register_ajax_call_back {
      */
     public function __construct() {
         
-       
-        
         add_action('wp_ajax_dwul_action_callback', array($this, 'dwul_action_callback'));
         add_action('wp_ajax_nopriv_dwul_action_callback', array($this, 'dwul_action_callback'));
         add_action('wp_ajax_dwul_enable_user_email', array($this, 'dwul_enable_user_email'));
@@ -32,15 +30,15 @@ class dwul_user_register_ajax_call_back {
     public function dwul_action_callback() {
 
         global $wpdb;
-        global $disableemail;
+        global $disable_user_id;
         $exitingarray = array();
-        $disableemail = $_REQUEST['useremail'];
-        $table_name = $wpdb->prefix . dwul_disable_user_email; 
+        $disable_id = $_REQUEST['user_id'];
+        $table_name = $wpdb->prefix . dwul_disable_user_id; 
         $exitingusertbl =  $wpdb->prefix .users; 
-        $exitinguserquery = "SELECT user_email FROM $exitingusertbl"; 
+        $exitinguserquery = "SELECT user_id FROM $exitingusertbl"; 
         $getexiting = $wpdb->get_col($exitinguserquery);
         
-        $user = get_user_by( 'email', $disableemail );
+        $user = get_user_by( 'ID', $disable_id );
         
         
         if($user->roles[0] == 'administrator'){
@@ -49,21 +47,19 @@ class dwul_user_register_ajax_call_back {
             
         }else{
             
-       
-            
         foreach ($getexiting as $exitinguser){
             
            $exitingarray[] = $exitinguser;
         
          }
-          if(!in_array($disableemail, $exitingarray)){
+          if(!in_array($disable_user_id, $exitingarray)){
               
               $successresponse = "12";
               
           }else{
         
          
-                $insertdata = $wpdb->insert($table_name, array('useremail' => $disableemail), array('%s'));
+                $insertdata = $wpdb->insert($table_name, array('user_id' => $disable_id), array('%d'));
                 if($insertdata){
 
                     $successresponse =  "1";
@@ -88,7 +84,7 @@ class dwul_user_register_ajax_call_back {
        
         global $wpdb;
         $array = array();
-        $usertable = $wpdb->prefix .dwul_disable_user_email;
+        $usertable = $wpdb->prefix .dwul_disable_user_id;
         
         if (!$user) {
             $user = get_user_by('login', $user_login);
@@ -99,7 +95,7 @@ class dwul_user_register_ajax_call_back {
         }
      
     
-        $query = "SELECT useremail FROM $usertable ";
+        $query = "SELECT user_id FROM $usertable ";
        
         $get = $wpdb->get_col($query);
        
@@ -136,7 +132,7 @@ class dwul_user_register_ajax_call_back {
     public function dwul_enable_user_email(){
      
      global $wpdb;   
-     $tblname = $wpdb->prefix .dwul_disable_user_email; 
+     $tblname = $wpdb->prefix .dwul_disable_user_id; 
      $activateuserid = $_REQUEST['activateuserid'];
      $delquery = $wpdb->query($wpdb->prepare("DELETE FROM $tblname WHERE id = %d",$activateuserid));   
       

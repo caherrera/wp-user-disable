@@ -2,7 +2,7 @@
 function dwul_install() {
 
         global $wpdb;
-        $table_name = $wpdb->prefix . 'dwul_disable_user_email'; 
+        $table_name = $wpdb->prefix . 'dwul_disable_user_id'; 
         if( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) != $table_name ) {
             
                 $charset_collate = $wpdb->get_charset_collate();

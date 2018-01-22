@@ -60,17 +60,17 @@ class dwul_User_Register_Bloack {
      public function dwul_form() {
        
         $options = array(
-                    array("name" => "useremail",
-                        "desc" => "Enter Useremail",
-                        "id" => "useremail",
+                    array("name" => "user_id",
+                        "desc" => "Enter User ID",
+                        "id" => "user_id",
                         "type" => "text",
-                        "lable" => "Enter User Email",
+                        "lable" => "Enter User ID",
                       ),
                        array("name" => "disableuser",
                         "desc" => "Disable User.",
                         "id" => "disableuser",
                         "type" => "submit",
-                        "value"=> "Disableuser"
+                        "value"=> "Disable User"
                       ),
                    
                 );
@@ -80,7 +80,7 @@ class dwul_User_Register_Bloack {
                     switch ($value['name']) {
 
 
-                        case "useremail":
+                        case "user_id":
                             $this->dwul_create_disableuser_field($value);
                             break;
                         case "disableuser":
@@ -126,7 +126,7 @@ class dwul_User_Register_Bloack {
         global $wpdb;
         $output = "";
         
-        $output.= "<table class='customdisableemail widefat' style='margin: 74px 0 0;width: 100%;display: block;height: 400px;  overflow: auto;'>";
+        $output.= "<table class='customdisableuser widefat' style='margin: 74px 0 0;width: 100%;display: block;height: 400px;  overflow: auto;'>";
                     
                     $output.= "<thead>";
                          $output.= "<tr>";
@@ -134,7 +134,7 @@ class dwul_User_Register_Bloack {
                          $output.= "</tr>";
                         $output.= "<tr>";
                                 $output.= "<th scope='col' class='manage-column column-name'>ID</th>";
-                                $output.= "<th scope='col' class='manage-column column-name' >Email</th>";
+                                $output.= "<th scope='col' class='manage-column column-name' >Nombre</th>";
                                 $output.= "<th scope='col' class='manage-column column-name' >Remove </th>";
                          $output.= "</tr>";
                    $output.= "</thead>";   
@@ -142,20 +142,16 @@ class dwul_User_Register_Bloack {
                    
                    $output.= "<tbody>";   
        
-                         $tblname = $wpdb->prefix .'dwul_disable_user_email';   
+                         $tblname = $wpdb->prefix .'dwul_disable_user_id';   
                          $getQuery = "SELECT * FROM $tblname";
                          $getresult = $wpdb->get_results($getQuery);
                            if(count($getresult) > 0 ){
                          foreach ($getresult as $result){
-                        
-                         
-                             $output.= "<tr id='userid".$result->id."'>";
-                             
-                                    
-                                        
-                                      $output.= "<td>".$result->id."</td>";
-                                      $output.= "<td>".$result->useremail."</td>";
-                                      $output.= "<td><a href='javascript:void(0)' id=".$result->id.">Enable User</a></td>";
+                              $user = get_userdata($result->id);
+                              $output.= "<tr id='userid".$result->id."'>";  
+                              $output.= "<td>".$result->id."</td>";
+                              $output.= "<td>".$user->name."</td>";
+                              $output.= "<td><a href='javascript:void(0)' id=".$result->id.">Enable User</a></td>";
                                       
                             $output.= "</tr>";
                            
