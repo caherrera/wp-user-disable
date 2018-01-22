@@ -9,7 +9,7 @@ function dwul_install() {
 
                 $sql = "CREATE TABLE $table_name (
                         id int(10) NOT NULL AUTO_INCREMENT,
-                        user_id bigint(20) NOT NULL,
+                        user_id bigint(20) NOT NULL UNIQUE,
                         PRIMARY KEY id (id)
                       ) $charset_collate;";
 

@@ -13,7 +13,7 @@ class dwul_User_Register_Bloack {
      * Start up
      */
     public function __construct() {
-        add_action('admin_menu', array($this, 'dwul_add_plugin_setting_page'));
+        //add_action('admin_menu', array($this, 'dwul_add_plugin_setting_page'));
         add_shortcode('disable-email-list', array($this,'dwul_disable_email_list'));
         add_shortcode('exituseremail', array($this,'dwul_exiting_user_email_list')); 
        
@@ -52,10 +52,10 @@ class dwul_User_Register_Bloack {
        
          echo '<span id = "adminroleerror" style="color:red;margin: 0px 0px 0px 83px;display:none;">Not a disable user because this is administrator!..</span>';   
          echo '<span id = "disableerror" style="color:red;margin: 0px 0px 0px 83px;display:none;">User hase been disable!...</span>';
-         echo '<span id = "notexit" style="color:red;margin: 0px 0px 0px 85px;display:none;">Not a any exiting email please check all user email..</span><br/>';
+         echo '<span id = "notexit" style="color:red;margin: 0px 0px 0px 85px;display:none;">Not a any exiting ID please check all user ID..</span><br/>';
          echo '<span id = "enteremail" style="color:red;margin: 0px 0px 0px 85px;display:none;">Please Enter User Email..</span><br/>';
          echo '<span id = "emailnotvalide" style="color:red;margin: 0px 0px 0px 83px;display:none;">User Email Are Not Valid..</span>'; 
-         echo '<span id = "notinsert" style="color:red;margin: 0px 0px 0px 83px;display:none;">User Hase Been Not Disable..</span>';
+         echo '<span id = "notinsert" style="color:red;margin: 0px 0px 0px 83px;display:none;">User Has Been Not Disable..</span>';
    }                     
      public function dwul_form() {
        
@@ -63,7 +63,7 @@ class dwul_User_Register_Bloack {
                     array("name" => "user_id",
                         "desc" => "Enter User ID",
                         "id" => "user_id",
-                        "type" => "text",
+                        "type" => "number",
                         "lable" => "Enter User ID",
                       ),
                        array("name" => "disableuser",
@@ -76,10 +76,7 @@ class dwul_User_Register_Bloack {
                 );
 
                 foreach ($options as $value) {
-
                     switch ($value['name']) {
-
-
                         case "user_id":
                             $this->dwul_create_disableuser_field($value);
                             break;
@@ -147,10 +144,10 @@ class dwul_User_Register_Bloack {
                          $getresult = $wpdb->get_results($getQuery);
                            if(count($getresult) > 0 ){
                          foreach ($getresult as $result){
-                              $user = get_userdata($result->id);
+                              $user = get_userdata($result->user_id);
                               $output.= "<tr id='userid".$result->id."'>";  
                               $output.= "<td>".$result->id."</td>";
-                              $output.= "<td>".$user->name."</td>";
+                              $output.= "<td>".$user->display_name."</td>";
                               $output.= "<td><a href='javascript:void(0)' id=".$result->id.">Enable User</a></td>";
                                       
                             $output.= "</tr>";
@@ -187,7 +184,7 @@ class dwul_User_Register_Bloack {
                          $exitingoutput.= "</tr>";
                         $exitingoutput.= "<tr>";
                                 $exitingoutput.= "<th scope='col' class='manage-column column-name'>ID</th>";
-                                $exitingoutput.= "<th scope='col' class='manage-column column-name' >Email</th>";
+                                $exitingoutput.= "<th scope='col' class='manage-column column-name' >Nombre</th>";
                                 $exitingoutput.= "<th scope='col' class='manage-column column-name' >User Role</th>";
                                
                          $exitingoutput.= "</tr>";
@@ -203,14 +200,13 @@ class dwul_User_Register_Bloack {
                                     'fields'       => 'all',
                                     
                              ); 
-                      $user_query =  get_users( $args ); 
-                 
+                         $user_query =  get_users( $args ); 
                          foreach ($user_query as $exiting){
                           
                              
                              $exitingoutput.= "<tr>";
                                      $exitingoutput.= "<td>".$exiting->ID."</td>";
-                                     $exitingoutput.= "<td>".$exiting->user_email."</td>";
+                                     $exitingoutput.= "<td>".$exiting->display_name."</td>";
                                      $exitingoutput.= "<td>".$exiting->roles[0]."</td>";
                                     
                             $exitingoutput.= "</tr>";

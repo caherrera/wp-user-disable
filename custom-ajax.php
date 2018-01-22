@@ -22,6 +22,8 @@ class dwul_user_register_ajax_call_back {
         add_action('admin_enqueue_scripts', array($this, 'dwul_ajax_script'));
         add_action( 'wp_login',   array( $this, 'dwul_disable_user_call_back'), 10, 2 );
         add_filter( 'login_message',array( $this, 'dwul_disable_user_login_message'));
+        add_filter( 'user_disable_filter', array( $this, 'filter_remove_users_disable'), 10, 3 );
+        add_filter('user_row_actions', [$this, 'bp_core_admin_user_row_actions'], 10, 2);
     }
 
     /**
@@ -32,15 +34,15 @@ class dwul_user_register_ajax_call_back {
         global $wpdb;
         global $disable_user_id;
         $exitingarray = array();
-        $disable_id = $_REQUEST['user_id'];
+        $disable_user_id = $_REQUEST['user_id'];
         $table_name = $wpdb->prefix . dwul_disable_user_id; 
         $exitingusertbl =  $wpdb->prefix .users; 
-        $exitinguserquery = "SELECT user_id FROM $exitingusertbl"; 
+        $exitinguserquery = "SELECT ID FROM $exitingusertbl"; 
         $getexiting = $wpdb->get_col($exitinguserquery);
         
-        $user = get_user_by( 'ID', $disable_id );
-        
-        
+        $user = get_userdata($disable_user_id);
+
+    
         if($user->roles[0] == 'administrator'){
             
              $successresponse = "11";
@@ -57,9 +59,7 @@ class dwul_user_register_ajax_call_back {
               $successresponse = "12";
               
           }else{
-        
-         
-                $insertdata = $wpdb->insert($table_name, array('user_id' => $disable_id), array('%d'));
+                $insertdata = $wpdb->insert($table_name, array('user_id' => $disable_user_id), array('%d'));
                 if($insertdata){
 
                     $successresponse =  "1";
@@ -71,7 +71,7 @@ class dwul_user_register_ajax_call_back {
           }
         }
        echo $successresponse;
-        die();
+       die();
     }
 
     public function dwul_ajax_script() { 
@@ -80,12 +80,9 @@ class dwul_user_register_ajax_call_back {
     }
 
     public function dwul_disable_user_call_back($user_login, $user = null) {
-
-       
         global $wpdb;
         $array = array();
         $usertable = $wpdb->prefix .dwul_disable_user_id;
-        
         if (!$user) {
             $user = get_user_by('login', $user_login);
         }
@@ -93,17 +90,16 @@ class dwul_user_register_ajax_call_back {
             // not logged in - definitely not disabled
             return;
         }
-     
     
         $query = "SELECT user_id FROM $usertable ";
        
         $get = $wpdb->get_col($query);
        
-        foreach ($get as $email){
+        foreach ($get as $user_id){
           
-          $result =  get_user_by('email', $email);
+          $result =  get_userdata($user_id);
          
-         $array[] = $result->data->user_login;
+          $array[] = $result->data->user_login;
         }
         
         
@@ -113,7 +109,7 @@ class dwul_user_register_ajax_call_back {
             wp_clear_auth_cookie();
 
             // Build login URL and then redirect
-            $login_url = site_url('wp-login.php', 'login');
+            $login_url = site_url('login', 'login');
             $login_url = add_query_arg('disabled', '1', $login_url);
             wp_redirect($login_url);
             exit;
@@ -121,10 +117,9 @@ class dwul_user_register_ajax_call_back {
     }
     
     public function dwul_disable_user_login_message( $message ) {
-
 		// Show the error message if it seems to be a disabled user
 		if ( isset( $_GET['disabled'] ) && $_GET['disabled'] == 1 ) 
-			$message =  '<div id="login_error">' . apply_filters( 'ja_disable_users_notice', __( 'User Account Disable', 'ja_disable_users' ) ) . '</div>';
+            $message .=  __('User Account Disable');
 
 		return $message;
 	}
@@ -134,7 +129,7 @@ class dwul_user_register_ajax_call_back {
      global $wpdb;   
      $tblname = $wpdb->prefix .dwul_disable_user_id; 
      $activateuserid = $_REQUEST['activateuserid'];
-     $delquery = $wpdb->query($wpdb->prepare("DELETE FROM $tblname WHERE id = %d",$activateuserid));   
+     $delquery = $wpdb->query($wpdb->prepare("DELETE FROM $tblname WHERE user_id = %d",$activateuserid));   
       
      if($delquery){
          
@@ -144,10 +139,84 @@ class dwul_user_register_ajax_call_back {
            $response =  "20";
            
        }
-       echo $response;
+     echo $response;
      die();
         
     }    
+
+    public function filter_remove_users_disable( $string, $members ){
+        global $wpdb;
+        $array = array();
+        $output = array();
+        $tblname = $wpdb->prefix .'dwul_disable_user_id'; 
+        if($wpdb->get_var( "SHOW TABLES LIKE '$tblname'" ) == $tblname){
+            $query = "SELECT user_id FROM $tblname";
+            $get = $wpdb->get_col($query);
+            foreach ($get as $user_id){
+                $array[] = $user_id;
+            }
+        }
+        foreach ($members as $member) {
+            if(!in_array($member->ID, $array)){
+                $output[]=$member;
+            }
+        }
+        
+        return $output;
+    }
+
+    public function get_list_user_disable(){
+      global $wpdb;
+      $array = array();
+      $tblname = $wpdb->prefix .'dwul_disable_user_id'; 
+      if($wpdb->get_var( "SHOW TABLES LIKE '$tblname'" ) == $tblname){
+        $query = "SELECT user_id FROM $tblname";
+        $get = $wpdb->get_col($query);
+        foreach ($get as $user_id){
+            $array[] = $user_id;
+        }
+      }
+      return $array;
+    }
+
+    /**
+     * @param $actions
+     * @param WP_User $user_object
+     *
+     * @return mixed
+     */
+    function bp_core_admin_user_row_actions($actions, $user_object)
+    {
+
+        // Setup the $user_id variable from the current user object.
+        $user_id = 0;
+        if ( ! empty($user_object->ID)) {
+            $user_id = absint($user_object->ID);
+        }
+
+        $disable_users = $this->get_list_user_disable();
+
+        // Bail early if user cannot perform this action, or is looking at themselves.
+        if (current_user_can('edit_user', $user_id) && (bp_loggedin_user_id() !== $user_id)) {
+
+          if(in_array($user_id, $disable_users)){
+            // Create a "View" link to enable.
+            $url               = "javascript:enableUser_byId($user_id)";
+            $actions['enable'] = sprintf('<a href="%1$s" target="_blank">%2$s</a>',
+                $url, esc_html__('Habilitar', 'buddypress'));
+          }
+          else{
+            // Create a "View" link to disable.
+            $url               = "javascript:disableUser_byId($user_id)";
+            $actions['disable'] = sprintf('<a href="%1$s" target="_blank">%2$s</a>',
+                $url, esc_html__('Deshabilitar', 'buddypress'));
+          }
+        }
+
+
+        // Return new actions.
+        return $actions;
+    }
 
 }
  $wpdru_ajax_call_back = new dwul_user_register_ajax_call_back();
