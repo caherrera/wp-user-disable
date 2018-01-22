@@ -32,15 +32,15 @@ class dwul_user_register_ajax_call_back {
         global $wpdb;
         global $disable_user_id;
         $exitingarray = array();
-        $disable_id = $_REQUEST['user_id'];
+        $disable_user_id = $_REQUEST['user_id'];
         $table_name = $wpdb->prefix . dwul_disable_user_id; 
         $exitingusertbl =  $wpdb->prefix .users; 
-        $exitinguserquery = "SELECT user_id FROM $exitingusertbl"; 
+        $exitinguserquery = "SELECT ID FROM $exitingusertbl"; 
         $getexiting = $wpdb->get_col($exitinguserquery);
         
-        $user = get_user_by( 'ID', $disable_id );
-        
-        
+        $user = get_userdata($disable_user_id);
+
+    
         if($user->roles[0] == 'administrator'){
             
              $successresponse = "11";
@@ -57,9 +57,7 @@ class dwul_user_register_ajax_call_back {
               $successresponse = "12";
               
           }else{
-        
-         
-                $insertdata = $wpdb->insert($table_name, array('user_id' => $disable_id), array('%d'));
+                $insertdata = $wpdb->insert($table_name, array('user_id' => $disable_user_id), array('%d'));
                 if($insertdata){
 
                     $successresponse =  "1";
@@ -71,7 +69,7 @@ class dwul_user_register_ajax_call_back {
           }
         }
        echo $successresponse;
-        die();
+       die();
     }
 
     public function dwul_ajax_script() { 
@@ -122,12 +120,12 @@ class dwul_user_register_ajax_call_back {
     
     public function dwul_disable_user_login_message( $message ) {
 
-		// Show the error message if it seems to be a disabled user
-		if ( isset( $_GET['disabled'] ) && $_GET['disabled'] == 1 ) 
-			$message =  '<div id="login_error">' . apply_filters( 'ja_disable_users_notice', __( 'User Account Disable', 'ja_disable_users' ) ) . '</div>';
+        // Show the error message if it seems to be a disabled user
+        if ( isset( $_GET['disabled'] ) && $_GET['disabled'] == 1 ) 
+            $message =  '<div id="login_error">' . apply_filters( 'ja_disable_users_notice', __( 'User Account Disable', 'ja_disable_users' ) ) . '</div>';
 
-		return $message;
-	}
+        return $message;
+    }
         
     public function dwul_enable_user_email(){
      
@@ -144,7 +142,7 @@ class dwul_user_register_ajax_call_back {
            $response =  "20";
            
        }
-       echo $response;
+     echo $response;
      die();
         
     }    

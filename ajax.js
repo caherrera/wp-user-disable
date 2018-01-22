@@ -1,29 +1,14 @@
  jQuery(document).ready(function() {
-     
-     
-                function validateEmail(email) {
-                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return re.test(email);
-                }
                 jQuery("#disableuser").click(function() {
 
                    
-                    var useremail = jQuery("#useremail").val();
-                    
-                    if(useremail == ''){
+                    var userid = jQuery("#user_id").val();
+                    if(userid == ''){
                         
-                        jQuery('#enteremail').fadeIn().delay(2000).fadeOut('slow');
+                        jQuery('#user_id').fadeIn().delay(2000).fadeOut('slow');
                        
                         return false;
                     }
-                    
-                    if(! validateEmail (useremail)){
-                        
-                         jQuery('#emailnotvalide').fadeIn().delay(2000).fadeOut('slow');
-                       
-                        return false;
-                    }
-                    
                     
                     var url = ajaxurl;
                     jQuery.ajax({
@@ -31,7 +16,7 @@
                         url: url,
                         data: {
                             action: 'dwul_action_callback',
-                            useremail: useremail,
+                            user_id: userid,
                         },
                         beforeSend: function() {
                             
@@ -39,11 +24,8 @@
                         
                         },
                         success: function(response) {
-                            
-                            
-                            
+                            console.log("Resp: " + response);
                              if(response == 11){
-                              
                               jQuery("#adminroleerror").fadeIn().delay(2000).fadeOut('slow');  
                               jQuery("#processimage").hide();
                               return false;  
@@ -63,23 +45,21 @@
                             }
                             
                             
-                           
                             if(response == 1){
-                            location.reload();
-                            jQuery("#disableerror").show();
-                            jQuery("#useremail").val('');
-                            jQuery("#processimage").hide();
-                        }
+                                location.reload();
+                                jQuery("#disableerror").show();
+                                jQuery("#user_id").val('');
+                                jQuery("#processimage").hide();
+                            }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
-
                             console.log(textStatus, errorThrown);
                         }
                     });
                     return false;
                 });
                 
-                 jQuery(".customdisableemail td a").click(function() {
+                 jQuery(".customdisableuser td a").click(function() {
 
                  var acivateid = jQuery(this).attr('id');
                  
@@ -96,7 +76,7 @@
 
                         },
                         success: function(userresponse) {
-                            
+                            console.log("Resp: " + userresponse);
                             if(userresponse == 1){
                                 
                                  jQuery("#userid"+acivateid ).fadeOut();

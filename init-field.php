@@ -8,7 +8,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Disable User Login
- * Description:       Disables user accounts via email address.
+ * Description:       Disables user accounts via ID.
  * Version:           1.0.0
  * Author:            sflores
  * Author URI:        http://www.solu4b.com/
