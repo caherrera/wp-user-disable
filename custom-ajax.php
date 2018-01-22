@@ -117,12 +117,12 @@ class dwul_user_register_ajax_call_back {
     }
     
     public function dwul_disable_user_login_message( $message ) {
-		// Show the error message if it seems to be a disabled user
-		if ( isset( $_GET['disabled'] ) && $_GET['disabled'] == 1 ) 
+    // Show the error message if it seems to be a disabled user
+    if ( isset( $_GET['disabled'] ) && $_GET['disabled'] == 1 ) 
             $message .=  __('User Account Disable');
 
-		return $message;
-	}
+    return $message;
+  }
         
     public function dwul_enable_user_email(){
      
