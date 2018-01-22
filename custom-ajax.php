@@ -22,6 +22,7 @@ class dwul_user_register_ajax_call_back {
         add_action('admin_enqueue_scripts', array($this, 'dwul_ajax_script'));
         add_action( 'wp_login',   array( $this, 'dwul_disable_user_call_back'), 10, 2 );
         add_filter( 'login_message',array( $this, 'dwul_disable_user_login_message'));
+        add_filter( 'user_disable_filter', array( $this, 'filter_remove_users_disable'), 10, 3 );
     }
 
     /**
@@ -78,12 +79,9 @@ class dwul_user_register_ajax_call_back {
     }
 
     public function dwul_disable_user_call_back($user_login, $user = null) {
-
-       
         global $wpdb;
         $array = array();
         $usertable = $wpdb->prefix .dwul_disable_user_id;
-        
         if (!$user) {
             $user = get_user_by('login', $user_login);
         }
@@ -91,17 +89,16 @@ class dwul_user_register_ajax_call_back {
             // not logged in - definitely not disabled
             return;
         }
-     
     
         $query = "SELECT user_id FROM $usertable ";
        
         $get = $wpdb->get_col($query);
        
-        foreach ($get as $email){
+        foreach ($get as $user_id){
           
-          $result =  get_user_by('email', $email);
+          $result =  get_userdata($user_id);
          
-         $array[] = $result->data->user_login;
+          $array[] = $result->data->user_login;
         }
         
         
@@ -111,7 +108,7 @@ class dwul_user_register_ajax_call_back {
             wp_clear_auth_cookie();
 
             // Build login URL and then redirect
-            $login_url = site_url('wp-login.php', 'login');
+            $login_url = site_url('login', 'login');
             $login_url = add_query_arg('disabled', '1', $login_url);
             wp_redirect($login_url);
             exit;
@@ -119,13 +116,12 @@ class dwul_user_register_ajax_call_back {
     }
     
     public function dwul_disable_user_login_message( $message ) {
+    // Show the error message if it seems to be a disabled user
+    if ( isset( $_GET['disabled'] ) && $_GET['disabled'] == 1 ) 
+            $message .=  __('User Account Disable');
 
-        // Show the error message if it seems to be a disabled user
-        if ( isset( $_GET['disabled'] ) && $_GET['disabled'] == 1 ) 
-            $message =  '<div id="login_error">' . apply_filters( 'ja_disable_users_notice', __( 'User Account Disable', 'ja_disable_users' ) ) . '</div>';
-
-        return $message;
-    }
+    return $message;
+  }
         
     public function dwul_enable_user_email(){
      
@@ -146,6 +142,27 @@ class dwul_user_register_ajax_call_back {
      die();
         
     }    
+
+    public function filter_remove_users_disable( $string, $members ){
+        global $wpdb;
+        $array = array();
+        $output = array();
+        $tblname = $wpdb->prefix .'dwul_disable_user_id'; 
+        if($wpdb->get_var( "SHOW TABLES LIKE '$tblname'" ) == $tblname){
+            $query = "SELECT user_id FROM $tblname";
+            $get = $wpdb->get_col($query);
+            foreach ($get as $user_id){
+                $array[] = $user_id;
+            }
+        }
+        foreach ($members as $member) {
+            if(!in_array($member->ID, $array)){
+                $output[]=$member;
+            }
+        }
+        
+        return $output;
+    }
 
 }
  $wpdru_ajax_call_back = new dwul_user_register_ajax_call_back();
