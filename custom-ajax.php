@@ -23,6 +23,7 @@ class dwul_user_register_ajax_call_back {
         add_action( 'wp_login',   array( $this, 'dwul_disable_user_call_back'), 10, 2 );
         add_filter( 'login_message',array( $this, 'dwul_disable_user_login_message'));
         add_filter( 'user_disable_filter', array( $this, 'filter_remove_users_disable'), 10, 3 );
+        add_filter('user_row_actions', [$this, 'bp_core_admin_user_row_actions'], 10, 2);
     }
 
     /**
@@ -128,7 +129,7 @@ class dwul_user_register_ajax_call_back {
      global $wpdb;   
      $tblname = $wpdb->prefix .dwul_disable_user_id; 
      $activateuserid = $_REQUEST['activateuserid'];
-     $delquery = $wpdb->query($wpdb->prepare("DELETE FROM $tblname WHERE id = %d",$activateuserid));   
+     $delquery = $wpdb->query($wpdb->prepare("DELETE FROM $tblname WHERE user_id = %d",$activateuserid));   
       
      if($delquery){
          
@@ -162,6 +163,59 @@ class dwul_user_register_ajax_call_back {
         }
         
         return $output;
+    }
+
+    public function get_list_user_disable(){
+      global $wpdb;
+      $array = array();
+      $tblname = $wpdb->prefix .'dwul_disable_user_id'; 
+      if($wpdb->get_var( "SHOW TABLES LIKE '$tblname'" ) == $tblname){
+        $query = "SELECT user_id FROM $tblname";
+        $get = $wpdb->get_col($query);
+        foreach ($get as $user_id){
+            $array[] = $user_id;
+        }
+      }
+      return $array;
+    }
+
+    /**
+     * @param $actions
+     * @param WP_User $user_object
+     *
+     * @return mixed
+     */
+    function bp_core_admin_user_row_actions($actions, $user_object)
+    {
+
+        // Setup the $user_id variable from the current user object.
+        $user_id = 0;
+        if ( ! empty($user_object->ID)) {
+            $user_id = absint($user_object->ID);
+        }
+
+        $disable_users = $this->get_list_user_disable();
+
+        // Bail early if user cannot perform this action, or is looking at themselves.
+        if (current_user_can('edit_user', $user_id) && (bp_loggedin_user_id() !== $user_id)) {
+
+          if(in_array($user_id, $disable_users)){
+            // Create a "View" link to enable.
+            $url               = "javascript:enableUser_byId($user_id)";
+            $actions['enable'] = sprintf('<a href="%1$s" target="_blank">%2$s</a>',
+                $url, esc_html__('Habilitar', 'buddypress'));
+          }
+          else{
+            // Create a "View" link to disable.
+            $url               = "javascript:disableUser_byId($user_id)";
+            $actions['disable'] = sprintf('<a href="%1$s" target="_blank">%2$s</a>',
+                $url, esc_html__('Deshabilitar', 'buddypress'));
+          }
+        }
+
+
+        // Return new actions.
+        return $actions;
     }
 
 }

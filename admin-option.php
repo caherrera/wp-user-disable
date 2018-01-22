@@ -13,7 +13,7 @@ class dwul_User_Register_Bloack {
      * Start up
      */
     public function __construct() {
-        add_action('admin_menu', array($this, 'dwul_add_plugin_setting_page'));
+        //add_action('admin_menu', array($this, 'dwul_add_plugin_setting_page'));
         add_shortcode('disable-email-list', array($this,'dwul_disable_email_list'));
         add_shortcode('exituseremail', array($this,'dwul_exiting_user_email_list')); 
        

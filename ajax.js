@@ -1,4 +1,47 @@
- jQuery(document).ready(function() {
+function disableUser_byId(userid){
+    var url = ajaxurl;
+    jQuery.ajax({
+        type: 'POST',
+        url: url,
+        data: {
+            action: 'dwul_action_callback',
+            user_id: userid,
+        },
+        success: function(response) {
+            console.log("Resp: " + response);
+            if(response == 1){
+                location.reload();
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus, errorThrown);
+        }
+    });
+}
+
+function enableUser_byId(userid){
+    var url = ajaxurl;
+    jQuery.ajax({
+        type: 'POST',
+        url: url,
+        data: {
+            action: 'dwul_enable_user_email',
+            activateuserid: userid
+        },
+        success: function(userresponse) {
+            if(userresponse == 1){
+                location.reload();
+            }
+            
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+
+            console.log(textStatus, errorThrown);
+        }
+    });
+}
+
+jQuery(document).ready(function() {
                 jQuery("#disableuser").click(function() {
 
                    
