@@ -1,14 +1,18 @@
-function disableUser_byId(userid){
+function disableUser_byId(userid,isDisable){
     var url = ajaxurl;
+    jQuery('#disable_by_id_spinner_loading_'+userid).show();
     jQuery.ajax({
         type: 'POST',
         url: url,
-        data: {
+        data: isDisable ? {
             action: 'dwul_action_callback',
             user_id: userid,
+        }:{
+            action: 'dwul_enable_user_email',
+            activateuserid: userid
         },
+
         success: function(response) {
-            console.log("Resp: " + response);
             if(response == 1){
                 jQuery('#wpbody-content .wrap .wp-header-end').after('<div id="notice-bloqueo-usuarios" class="updated notice"> Usuario deshabilitado con éxito</div>');
             }
@@ -17,42 +21,17 @@ function disableUser_byId(userid){
             }
             setTimeout(function() {
                  window.location.reload();
-              }, 1000);
+              }, 2000);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log(textStatus, errorThrown);
+        },
+        done: function () {
+            jQuery('#disable_by_id_spinner_loading_'+userid).hide();
         }
     });
 }
 
-function enableUser_byId(userid){
-    var url = ajaxurl;
-    jQuery.ajax({
-        type: 'POST',
-        url: url,
-        data: {
-            action: 'dwul_enable_user_email',
-            activateuserid: userid
-        },
-        success: function(userresponse) {
-            if(userresponse == 1){
-                //location.reload();
-                jQuery('#wpbody-content .wrap .wp-header-end').after('<div id="notice-bloqueo-usuarios" class="updated notice"> Usuario habilitado con éxito</div>');
-            }
-            else{
-                jQuery('#wpbody-content .wrap .wp-header-end').after('<div id="notice-bloqueo-usuarios" class="error notice"> Usuario no pudo ser habilitado!</div>');
-            }
-            setTimeout(function() {
-                 window.location.reload();
-              }, 1000);
-            
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-
-            console.log(textStatus, errorThrown);
-        }
-    });
-}
 
 jQuery(document).ready(function() {
                 jQuery("#disableuser").click(function() {
