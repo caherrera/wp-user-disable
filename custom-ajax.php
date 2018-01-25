@@ -24,6 +24,7 @@ class dwul_user_register_ajax_call_back
         add_action('wp_login', array($this, 'dwul_disable_user_call_back'), 10, 2);
         add_filter('login_message', array($this, 'dwul_disable_user_login_message'));
         add_filter('user_disable_filter', array($this, 'filter_remove_users_disable'), 10, 3);
+        add_filter('user_birthday_disable_filter', array($this, 'filter_remove_users_birthday_disable'), 10, 3);
         add_filter('user_row_actions', [$this, 'bp_core_admin_user_row_actions'], 10, 2);
     }
 
@@ -152,20 +153,24 @@ class dwul_user_register_ajax_call_back
 
     public function filter_remove_users_disable($string, $members)
     {
-        global $wpdb;
-        $array = array();
+        $array = $this->get_list_user_disable();
         $output = array();
-        $tblname = $wpdb->prefix . 'dwul_disable_user_id';
-        if ($wpdb->get_var("SHOW TABLES LIKE '$tblname'") == $tblname) {
-            $query = "SELECT user_id FROM $tblname";
-            $get = $wpdb->get_col($query);
-            foreach ($get as $user_id) {
-                $array[] = $user_id;
-            }
-        }
         foreach ($members as $member) {
             if (!in_array($member->ID, $array)) {
                 $output[] = $member;
+            }
+        }
+
+        return $output;
+    }
+
+    public function filter_remove_users_birthday_disable($string, $all_birthdays)
+    {
+        $array = $this->get_list_user_disable();
+        $output = array();
+        foreach ($all_birthdays as $user_id => $birthday) {
+            if (!in_array($user_id, $array)) {
+                $output[$user_id] = $birthday;
             }
         }
 
