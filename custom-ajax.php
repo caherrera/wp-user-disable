@@ -24,7 +24,6 @@ class dwul_user_register_ajax_call_back
         add_action('wp_login', array($this, 'dwul_disable_user_call_back'), 10, 2);
         add_filter('login_message', array($this, 'dwul_disable_user_login_message'));
         add_filter('user_disable_filter', array($this, 'filter_remove_users_disable'), 10, 3);
-	    add_filter('woffice_exclude_user_ids_from_extrafooter', array($this, 'filter_remove_users_disable'), 10, 3);
 	    add_filter('user_birthday_disable_filter', array($this, 'filter_remove_users_birthday_disable'), 10, 3);
         add_filter('user_row_actions', [$this, 'bp_core_admin_user_row_actions'], 10, 2);
     }
