@@ -39,7 +39,7 @@ class dwul_user_register_ajax_call_back
         $exitingarray = array();
         $disable_user_id = $_REQUEST['user_id'];
         $table_name = $wpdb->prefix . dwul_disable_user_id;
-        $exitingusertbl = $wpdb->prefix . users;
+        $exitingusertbl = $wpdb->prefix . 'users';
         $exitinguserquery = "SELECT ID FROM $exitingusertbl";
         $getexiting = $wpdb->get_col($exitinguserquery);
 
