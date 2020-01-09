@@ -115,12 +115,25 @@ class dwul_user_register_ajax_call_back {
 		return $message;
 	}
 
+
+
+	public function dwul_enable_user_id($activateuserid) {
+
+		global $wpdb;
+		$tblname        = $wpdb->prefix . dwul_disable_user_id;
+
+		$delquery       = $wpdb->query( $wpdb->prepare( "DELETE FROM $tblname WHERE user_id = %d", $activateuserid ) );
+
+		return $delquery;
+
+	}
+
 	public function dwul_enable_user_email() {
 
 		global $wpdb;
 		$tblname        = $wpdb->prefix . dwul_disable_user_id;
 		$activateuserid = $_REQUEST['activateuserid'];
-		$delquery       = $wpdb->query( $wpdb->prepare( "DELETE FROM $tblname WHERE user_id = %d", $activateuserid ) );
+		$delquery       = $this->dwul_enable_user_id($activateuserid);
 
 		if ( $delquery ) {
 
